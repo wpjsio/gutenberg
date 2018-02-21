@@ -471,11 +471,8 @@ export default {
 		speak( message, 'assertive' );
 	},
 	INITIALIZE_META_BOX_STATE( action, store ) {
-		if ( ! has( window, 'postboxes.add_postbox_toggles' ) ) {
-			return;
-		}
 		// Allow toggling metaboxes panels
-		if ( some( action.metaBoxes ) ) {
+		if ( some( action.metaBoxes ) && has( window, 'postboxes.add_postbox_toggles' ) ) {
 			window.postboxes.add_postbox_toggles( 'post' );
 		}
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
