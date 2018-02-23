@@ -30,6 +30,7 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	selectBlock,
+	setTemplateValidity,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -417,7 +418,10 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( setupEditorState( post, [], {}, true ) );
+			expect( result ).toEqual( [
+				setTemplateValidity( true ),
+				setupEditorState( post, [], {} ),
+			] );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -435,8 +439,11 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result.blocks ).toHaveLength( 1 );
-			expect( result ).toEqual( setupEditorState( post, result.blocks, {}, true ) );
+			expect( result[ 1 ].blocks ).toHaveLength( 1 );
+			expect( result ).toEqual( [
+				setTemplateValidity( true ),
+				setupEditorState( post, result[ 1 ].blocks, {} ),
+			] );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -453,7 +460,10 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' }, true ) );
+			expect( result ).toEqual( [
+				setTemplateValidity( true ),
+				setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ),
+			] );
 		} );
 	} );
 
