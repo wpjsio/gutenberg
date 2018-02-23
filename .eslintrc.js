@@ -149,6 +149,10 @@ module.exports = {
 				message: 'Use @wordpress/viewport as import path instead.',
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^core-data$/]",
+				"message": "Use @wordpress/core-data as import path instead."
+			},
+			{
 				selector: 'CallExpression[callee.name=/^__|_n|_x$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
 				message: 'Translate function arguments must be string literals.',
 			},
