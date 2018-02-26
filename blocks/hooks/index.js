@@ -3,6 +3,7 @@
  */
 import './align';
 import './anchor';
+import './colors';
 import './custom-class-name';
 import './deprecated';
 import './generated-class-name';

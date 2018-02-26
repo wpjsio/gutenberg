@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,6 +22,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
+import { getClassFromAttribute } from '../../color-mechanism';
 
 const { getComputedStyle } = window;
 
@@ -61,6 +67,8 @@ class ButtonBlock extends Component {
 			setAttributes,
 			isSelected,
 			className,
+			getColorFromAttribute,
+			setColorAttributeByColor,
 		} = this.props;
 
 		const {
@@ -73,13 +81,18 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
+		const textColorClass = getClassFromAttribute( 'text', textColor );
+		const backgroundColorClass = getClassFromAttribute( 'background', color );
+		const textColorValue = getColorFromAttribute( textColor );
+		const backgroundColorValue = getColorFromAttribute( color );
+
 		return [
 			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
+			<span key="button" className={ classnames( className, textColorClass, backgroundColorClass ) } title={ title } ref={ this.bindRef }>
 				<RichText
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -88,8 +101,8 @@ class ButtonBlock extends Component {
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					className="wp-block-button__link"
 					style={ {
-						backgroundColor: color,
-						color: textColor,
+						backgroundColor: ! backgroundColorClass ? color : undefined,
+						color: ! textColorClass ? textColorValue : undefined,
 					} }
 					isSelected={ isSelected }
 					keepPlaceholderOnFocus
@@ -101,23 +114,23 @@ class ButtonBlock extends Component {
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
-						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
+						<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColorValue } >
 							<ColorPalette
-								value={ color }
-								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+								value={ backgroundColorValue }
+								onChange={ setColorAttributeByColor( 'color' ) }
 							/>
 						</PanelColor>
-						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
+						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColorValue } >
 							<ColorPalette
-								value={ textColor }
-								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+								value={ textColorValue }
+								onChange={ setColorAttributeByColor( 'textColor' ) }
 							/>
 						</PanelColor>
 						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 							node={ this.nodeRef }
-							textColor={ textColor }
-							backgroundColor={ color }
-							isLargeText={ true }
+							textColor={ textColorValue }
+							backgroundColor={ backgroundColorValue }
+							isLargeText
 						/> }
 					</InspectorControls>
 				}
@@ -201,16 +214,18 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
+		const backgroundClass = getClassFromAttribute( 'background', color );
+		const textClass = getClassFromAttribute( 'text', textColor );
 
 		const buttonStyle = {
-			backgroundColor: color,
-			color: textColor,
+			backgroundColor: ! backgroundClass ? color : undefined,
+			color: ! textClass ? textColor : undefined,
 		};
 
 		const linkClass = 'wp-block-button__link';
 
 		return (
-			<div className={ `align${ align }` }>
+			<div className={ classnames( `align${ align }`, backgroundClass, textClass ) }>
 				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>

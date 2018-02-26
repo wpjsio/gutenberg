@@ -23,7 +23,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 
 	return (
 		<div className="blocks-color-palette">
-			{ map( colors, ( color ) => {
+			{ map( colors, ( { name, color } ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
@@ -34,7 +34,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 							className={ className }
 							style={ style }
 							onClick={ applyOrUnset( color ) }
-							aria-label={ sprintf( __( 'Color: %s' ), color ) }
+							aria-label={ sprintf( __( 'Color: %s' ), name || color ) }
 							aria-pressed={ value === color }
 						/>
 					</div>

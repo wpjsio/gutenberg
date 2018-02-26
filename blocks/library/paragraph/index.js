@@ -31,6 +31,7 @@ import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
+import { getClassFromAttribute } from '../../color-mechanism';
 
 const { getComputedStyle } = window;
 
@@ -89,6 +90,8 @@ class ParagraphBlock extends Component {
 			isSelected,
 			mergeBlocks,
 			onReplace,
+			getColorFromAttribute,
+			setColorAttributeByColor,
 		} = this.props;
 
 		const {
@@ -103,6 +106,11 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		const className = dropCap ? 'has-drop-cap' : null;
+
+		const textColorClass = getClassFromAttribute( 'text', textColor );
+		const backgroundColorClass = getClassFromAttribute( 'background', backgroundColor );
+		const textColorValue = getColorFromAttribute( textColor );
+		const backgroundColorValue = getColorFromAttribute( backgroundColor );
 
 		return [
 			isSelected && (
@@ -133,22 +141,22 @@ class ParagraphBlock extends Component {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColorValue } initialOpen={ false }>
 						<ColorPalette
-							value={ backgroundColor }
-							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
+							value={ backgroundColorValue }
+							onChange={ setColorAttributeByColor( 'backgroundColor' ) }
 						/>
 					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColorValue } initialOpen={ false }>
 						<ColorPalette
-							value={ textColor }
-							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+							value={ textColorValue }
+							onChange={ setColorAttributeByColor( 'textColor' ) }
 						/>
 					</PanelColor>
 					{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 						node={ this.nodeRef }
-						textColor={ textColor }
-						backgroundColor={ backgroundColor }
+						textColor={ textColorValue }
+						backgroundColor={ backgroundColorValue }
 						isLargeText={ fontSize >= 18 }
 					/> }
 					<PanelBody title={ __( 'Block Alignment' ) }>
@@ -169,10 +177,12 @@ class ParagraphBlock extends Component {
 							tagName="p"
 							className={ classnames( 'wp-block-paragraph', className, {
 								'has-background': backgroundColor,
+								[ backgroundColorClass ]: backgroundColorClass,
+								[ textColorClass ]: textColorClass,
 							} ) }
 							style={ {
-								backgroundColor: backgroundColor,
-								color: textColor,
+								backgroundColor: ! backgroundColorClass ? backgroundColorValue : undefined,
+								color: ! textColorClass ? textColorValue : undefined,
 								fontSize: fontSize ? fontSize + 'px' : undefined,
 								textAlign: align,
 							} }
@@ -313,14 +323,19 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const backgroundClass = getClassFromAttribute( 'background', backgroundColor );
+		const textClass = getClassFromAttribute( 'text', textColor );
+
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
+			[ backgroundClass ]: backgroundClass,
+			[ textClass ]: textClass,
 		} );
 		const styles = {
-			backgroundColor: backgroundColor,
-			color: textColor,
+			backgroundColor: ! backgroundClass ? backgroundColor : undefined,
+			color: ! textClass ? textColor : undefined,
 			fontSize: fontSize,
 			textAlign: align,
 		};
