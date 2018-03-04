@@ -1301,3 +1301,7 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+export function getBlockListSettings( state, id ) {
+	return state.blockListSettings[ id ];
+}

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter, isEmpty } from 'lodash';
+import { filter, get, intersection, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 import Inserter from '../inserter';
-import { getFrecentInserterItems } from '../../store/selectors';
+import { getFrecentInserterItems, getBlockInsertionPoint, getBlockListSettings } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
 function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
@@ -54,16 +54,31 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 export default compose(
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock, blockTypes } = settings;
-
 		return {
 			isLocked: !! templateLock,
-			enabledBlockTypes: blockTypes,
+			globalEnabledBlockTypes: blockTypes,
 		};
 	} ),
 	connect(
-		( state, { enabledBlockTypes } ) => ( {
-			items: getFrecentInserterItems( state, enabledBlockTypes, 3 ),
-		} ),
+		( state, { globalEnabledBlockTypes } ) => {
+			const insertionPoint = getBlockInsertionPoint( state );
+			const { rootUID } = insertionPoint;
+			const blockListSettings = getBlockListSettings( state, rootUID );
+			const supportedNestedBlocks = get( blockListSettings, 'supportedBlocks' );
+
+			let supportedBlockTypes;
+			if ( ! supportedNestedBlocks ) {
+				supportedBlockTypes = globalEnabledBlockTypes;
+			} else if ( true === globalEnabledBlockTypes ) {
+				supportedBlockTypes = supportedNestedBlocks;
+			} else {
+				supportedBlockTypes = intersection( globalEnabledBlockTypes, supportedNestedBlocks );
+			}
+
+			return {
+				items: getFrecentInserterItems( state, supportedBlockTypes, 3 ),
+			};
+		},
 		( dispatch, { uid, layout } ) => ( {
 			onInsert( { name, initialAttributes } ) {
 				const block = createBlock( name, { ...initialAttributes, layout } );

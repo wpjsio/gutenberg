@@ -23,6 +23,7 @@ import ImagePlaceholder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
+import InnerBlocks from '../../inner-blocks';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -95,7 +96,7 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
+		const { id, url, title, align, contentAlign, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
@@ -196,22 +197,23 @@ export const settings = {
 				style={ style }
 				className={ classes }
 			>
-				{ title || isSelected ? (
-					<RichText
-						tagName="h2"
-						placeholder={ __( 'Write title…' ) }
-						value={ title }
-						onChange={ ( value ) => setAttributes( { title: value } ) }
-						isSelected={ isSelected }
-						inlineToolbar
-					/>
-				) : null }
+				<InnerBlocks
+					template={ [
+						[ 'core/paragraph', {
+							align: 'center',
+							fontSize: 37,
+							placeholder: 'Write title…',
+							textColor: '#fff',
+						} ],
+					] }
+					allowedBlockNames={ [ 'core/button', 'core/heading', 'core/paragraph', 'core/subhead' ] }
+				/>
 			</section>,
 		];
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
+		const { url, hasParallax, dimRatio, align, contentAlign } = attributes;
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -228,7 +230,7 @@ export const settings = {
 
 		return (
 			<section className={ classes } style={ style }>
-				<h2>{ title }</h2>
+				<InnerBlocks.Content />
 			</section>
 		);
 	},

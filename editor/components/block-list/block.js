@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, noop, first, last } from 'lodash';
+import { get, isEqual, reduce, size, castArray, noop, first, last } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -58,6 +58,7 @@ import {
 	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
+	updateBlockListSettings,
 } from '../../store/actions';
 import {
 	getBlock,
@@ -74,7 +75,9 @@ import {
 	getBlockMode,
 	getCurrentPostType,
 	getSelectedBlocksInitialCaretPosition,
+	getBlockListSettings,
 } from '../../store/selectors';
+import createBlocksFromTemplate from '../../utils/create-blocks-from-template';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
@@ -100,6 +103,8 @@ export class BlockListBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.updateNestingSettingsIfRequired = this.updateNestingSettingsIfRequired.bind( this );
+		this.insertTemplateBlocksIfInnerBlocksEmpty = this.insertTemplateBlocksIfInnerBlocksEmpty.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -122,7 +127,9 @@ export class BlockListBlock extends Component {
 			BlockList: createInnerBlockList(
 				uid,
 				renderBlockMenu,
-				showContextualToolbar
+				showContextualToolbar,
+				this.updateNestingSettingsIfRequired,
+				this.insertTemplateBlocksIfInnerBlocksEmpty,
 			),
 			canUserUseUnfilteredHTML: get( this.props.user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
 		};
@@ -505,6 +512,19 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	insertTemplateBlocksIfInnerBlocksEmpty( template ) {
+		const { block, onInsertBlocks, uid } = this.props;
+		if ( template && ! block.innerBlocks.length ) {
+			onInsertBlocks( createBlocksFromTemplate( template ), 0, uid );
+		}
+	}
+
+	updateNestingSettingsIfRequired( newSettings ) {
+		if ( ! isEqual( this.props.blockListSettings, newSettings ) ) {
+			this.props.updateNestedSettings( this.props.uid, newSettings );
+		}
+	}
+
 	render() {
 		const {
 			block,
@@ -708,6 +728,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		postType: getCurrentPostType( state ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 		isSelected,
+		blockListSettings: getBlockListSettings( state, uid ),
 	};
 };
 
@@ -732,12 +753,11 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( stopTyping() );
 	},
 
-	onInsertBlocks( blocks, index ) {
+	onInsertBlocks( blocks, index, uid ) {
 		const { rootUID, layout } = ownProps;
-
 		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
 
-		dispatch( insertBlocks( blocks, index, rootUID ) );
+		dispatch( insertBlocks( blocks, index, uid || rootUID ) );
 	},
 
 	onRemove( uid ) {
@@ -764,6 +784,10 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
+	},
+
+	updateNestedSettings( uid, settings ) {
+		dispatch( updateBlockListSettings( uid, settings ) );
 	},
 } );
 

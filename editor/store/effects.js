@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,6 +53,7 @@ import {
 	getReusableBlock,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
+import createBlocksFromTemplate from '../utils/create-blocks-from-template';
 
 /**
  * Module Constants
@@ -281,15 +282,6 @@ export default {
 		if ( post.content.raw ) {
 			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			const createBlocksFromTemplate = ( template ) => {
-				return map( template, ( [ name, attributes, innerBlocksTemplate ] ) => {
-					return createBlock(
-						name,
-						attributes,
-						createBlocksFromTemplate( innerBlocksTemplate )
-					);
-				} );
-			};
 			blocks = createBlocksFromTemplate( settings.template );
 		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
 			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
