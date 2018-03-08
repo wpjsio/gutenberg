@@ -25,6 +25,7 @@ $toggle-border-width: 2px;
 	&.is-checked .components-form-toggle__track {
 		background-color: $blue-medium-400;
 		border: $toggle-border-width solid $blue-medium-400;
+		border: #{ $toggle-height / 2 } solid transparent; // expand the border to fake a solid in Windows High Contrast Mode
 	}
 
 	.components-form-toggle__thumb {
@@ -43,18 +44,13 @@ $toggle-border-width: 2px;
 	&__input:focus {
 		& + .components-form-toggle__track {
 			@include switch-style__focus-active();
-
-			 & + .components-form-toggle__thumb {
-				 border-width: 5px;
-			 }
 		}
 	}
 
 	&.is-checked {
 		.components-form-toggle__thumb {
 			background-color: $white;
-			border-color: $white; // has to have an explicit border for Windows High Contrast Mode
-			border-width: 5px; // expand the border to fake a solid in Windows High Contrast Mode
+			border-width: 0; // zero out the border color to make the thumb invisible in Windows High Contrast Mode
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
 		}
 
@@ -76,8 +72,8 @@ $toggle-border-width: 2px;
 	}
 
 	.components-form-toggle__on {
-		left: $toggle-border-width * 3;
-		fill: $white;
+		left: $toggle-border-width * 3 + 2px; // indent 2px extra because icon is thinner
+		filter: invert( 100% ) contrast( 500% ); // this makes the icon white, and it makes it dark blue in Windows High Contrast Mode
 	}
 }
 
