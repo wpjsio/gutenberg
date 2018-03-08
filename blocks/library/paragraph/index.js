@@ -196,7 +196,6 @@ class ParagraphBlock extends Component {
 							beforeIcon="editor-textcolor"
 							afterIcon="editor-textcolor"
 						/>
-						<span>{ attributes.textClass }</span>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
