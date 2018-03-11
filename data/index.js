@@ -3,7 +3,7 @@
  */
 import isEqualShallow from 'is-equal-shallow';
 import { createStore } from 'redux';
-import { flowRight, without, mapValues, get } from 'lodash';
+import { flowRight, without, mapValues } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -119,13 +119,12 @@ export function registerSelectors( reducerKey, newSelectors ) {
 export function registerResolvers( reducerKey, newResolvers ) {
 	const createResolver = ( selector, key ) => {
 		// Don't modify selector behavior if no resolver exists.
-		let fulfill = get( newResolvers, [ key, 'fulfill' ] );
-		if ( typeof fulfill !== 'function' ) {
+		if ( ! newResolvers.hasOwnProperty( key ) ) {
 			return selector;
 		}
 
 		// Ensure single invocation per argument set via memoization.
-		fulfill = memize( fulfill );
+		const fulfill = memize( newResolvers[ key ] );
 
 		return ( ...args ) => {
 			fulfill( ...args );
