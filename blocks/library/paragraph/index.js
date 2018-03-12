@@ -11,7 +11,6 @@ import { concatChildren, Component, RawHTML } from '@wordpress/element';
 import {
 	Autocomplete,
 	PanelBody,
-	PanelColor,
 	RangeControl,
 	ToggleControl,
 	withFallbackStyles,
@@ -30,6 +29,7 @@ import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import ColorPalette from '../../color-palette';
+import ConditionalPanelColor from '../../conditional-panel-color';
 import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
@@ -133,18 +133,18 @@ class ParagraphBlock extends Component {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
+					<ConditionalPanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
-					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
+					</ConditionalPanelColor>
+					<ConditionalPanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-					</PanelColor>
+					</ConditionalPanelColor>
 					{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 						node={ this.nodeRef }
 						textColor={ textColor }

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, ToggleControl, withFallbackStyles } from '@wordpress/components';
+import { Dashicon, IconButton, ToggleControl, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
+import ConditionalPanelColor from '../../conditional-panel-color';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
 
@@ -101,18 +102,18 @@ class ButtonBlock extends Component {
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
-						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
+						<ConditionalPanelColor title={ __( 'Background Color' ) } colorValue={ color } >
 							<ColorPalette
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 							/>
-						</PanelColor>
-						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
+						</ConditionalPanelColor>
+						<ConditionalPanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
 							<ColorPalette
 								value={ textColor }
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 							/>
-						</PanelColor>
+						</ConditionalPanelColor>
 						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 							node={ this.nodeRef }
 							textColor={ textColor }
