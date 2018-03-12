@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, last, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,8 +49,10 @@ import {
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
+	getBlockRootUID,
 	getBlocks,
 	getReusableBlock,
+	getPreviousBlockUid,
 	getProvisionalBlockUID,
 	isBlockSelected,
 	POST_UPDATE_TRANSACTION_ID,
@@ -499,4 +501,15 @@ export default {
 	SELECT_BLOCK: removeProvisionalBlock,
 
 	MULTI_SELECT: removeProvisionalBlock,
+
+	REMOVE_BLOCKS( action, { getState, dispatch } ) {
+		const state = getState();
+		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
+		const firstRemovedBlockUID = action.uids[ 0 ];
+		const rootUID = getBlockRootUID( previousState, firstRemovedBlockUID );
+		const blockUIDToSelect = getPreviousBlockUid( previousState, firstRemovedBlockUID ) || rootUID;
+		if ( blockUIDToSelect ) {
+			dispatch( selectBlock( blockUIDToSelect ) );
+		}
+	},
 };
