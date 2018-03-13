@@ -95,6 +95,13 @@ describe( 'actions', () => {
 			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
 				type: 'INITIALIZE_META_BOX_STATE',
 				metaBoxes,
+				postType: 'post',
+			} );
+
+			expect( initializeMetaBoxState( metaBoxes, 'chicken' ) ).toEqual( {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes,
+				postType: 'chicken',
 			} );
 		} );
 	} );

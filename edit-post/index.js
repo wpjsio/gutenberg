@@ -105,7 +105,7 @@ export function initializeEditor( id, post, settings ) {
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
-			store.dispatch( initializeMetaBoxState( metaBoxes ) );
+			store.dispatch( initializeMetaBoxState( metaBoxes, post.type ) );
 		},
 	};
 }

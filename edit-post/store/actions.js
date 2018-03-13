@@ -103,13 +103,15 @@ export function switchEditorMode( mode ) {
  * This indicates that the sidebar has a meta box but the normal area does not.
  *
  * @param {Object} metaBoxes Whether meta box locations are active.
+ * @param {string} postType  Post type where meta boxes are rendered.
  *
  * @return {Object} Action object.
  */
-export function initializeMetaBoxState( metaBoxes ) {
+export function initializeMetaBoxState( metaBoxes, postType = 'post' ) {
 	return {
 		type: 'INITIALIZE_META_BOX_STATE',
 		metaBoxes,
+		postType,
 	};
 }
 
